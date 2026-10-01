@@ -1,0 +1,128 @@
+lesson_id: "01_branching"
+title: "Creating and Switching Branches"
+description: "Learn how to create feature branches - the first step in GitHub flow"
+objectives:
+  - "Understand why we use branches"
+  - "View existing branches"
+  - "Create a new feature branch"
+  - "Switch between branches"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Welcome to GitHub Flow!
+
+      In GitHub flow, we never commit directly to the **main** branch.
+      Instead, we create a separate **feature branch** for each piece of work.
+
+      This keeps the main branch clean and stable, while allowing us to
+      experiment and collaborate safely on new features.
+
+      **Press Enter to continue...**
+
+  - step_id: "view_branches"
+    step_type: "command"
+    instruction: |
+      Let's start by seeing what branches exist in your repository.
+
+      **Type:** `git branch`
+    expected_commands:
+      - "git branch"
+    success_message: |
+      You can see we currently only have the **main** branch.
+      The asterisk (*) shows which branch you're on.
+    failure_hints:
+      - "The command to list branches is 'git branch'"
+      - "Just type: git branch"
+
+  - step_id: "explain_feature_branch"
+    step_type: "explanation"
+    instruction: |
+      # Creating a Feature Branch
+
+      Now we'll create a new branch for our feature. Good branch names are:
+      - **Descriptive**: `add-login-form`, `fix-navbar-bug`
+      - **Lowercase with hyphens**: `my-feature-name`
+      - **Short but meaningful**: not just `feature1` or `test`
+
+      We'll create a branch called **add-login** using `git checkout -b`.
+
+      **Press Enter to continue...**
+
+  - step_id: "create_branch"
+    step_type: "command"
+    instruction: |
+      Create and switch to a new branch called **add-login**.
+
+      The `-b` flag tells git to **create** the branch and switch to it.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+      - "git switch -c add-login"
+    success_message: |
+      Excellent! You've created a new branch and switched to it.
+      Now any commits you make will be on this branch, not main.
+    failure_hints:
+      - "Use: git checkout -b <branch-name>"
+      - "The branch name should be 'add-login'"
+      - "Try: git checkout -b add-login"
+
+  - step_id: "verify_branch"
+    step_type: "command"
+    instruction: |
+      Let's verify we're on the new branch.
+
+      **Type:** `git branch`
+    expected_commands:
+      - "git branch"
+    success_message: |
+      Notice the asterisk (*) is now next to **add-login** - that's your current branch!
+      You also still have **main**, but you're no longer on it.
+    failure_hints:
+      - "Type: git branch"
+
+  - step_id: "switch_to_main"
+    step_type: "command"
+    instruction: |
+      You can switch back to main at any time using `git checkout`.
+
+      **Type:** `git checkout main`
+    expected_commands:
+      - "git checkout main"
+      - "git switch main"
+    success_message: |
+      You're back on main! Switching branches is instant in Git.
+    failure_hints:
+      - "Use: git checkout main"
+
+  - step_id: "switch_back"
+    step_type: "command"
+    instruction: |
+      Now switch back to your feature branch to continue working.
+
+      **Type:** `git checkout add-login`
+    expected_commands:
+      - "git checkout add-login"
+      - "git switch add-login"
+    success_message: |
+      Perfect! You're back on your feature branch and ready to work.
+    failure_hints:
+      - "Use: git checkout add-login"
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Lesson Complete!
+
+      You've learned the first step of GitHub flow:
+
+      - **`git branch`** - View all branches
+      - **`git checkout -b <name>`** - Create and switch to a new branch
+      - **`git checkout <name>`** - Switch to an existing branch
+
+      **Key Point:** Always create a new branch before starting work.
+      This keeps main clean and makes collaboration easier!
+
+      **Press Enter to finish this lesson...**

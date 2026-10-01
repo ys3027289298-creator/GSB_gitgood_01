@@ -1,0 +1,186 @@
+lesson_id: "02_commits"
+title: "Making Commits"
+description: "Learn how to stage changes and create commits"
+objectives:
+  - "Understand the staging area"
+  - "Stage files for commit"
+  - "Create commits with good messages"
+  - "View your commit history"
+
+required_lessons:
+  - "01_branching"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Making Commits
+
+      Now that you have a feature branch, it's time to make changes
+      and commit them.
+
+      In Git, creating a commit is a **two-step process**:
+      1. **Stage** your changes with `git add`
+      2. **Commit** them with `git commit`
+
+      This two-step process lets you choose exactly which changes
+      go into each commit.
+
+      **Press Enter to continue...**
+
+  - step_id: "setup_branch"
+    step_type: "command"
+    instruction: |
+      First, let's create a branch for our work.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+      - "git switch -c add-login"
+    success_message: "Great! You're on your feature branch."
+    failure_hints:
+      - "Type: git checkout -b add-login"
+    setup_changes: []
+
+  - step_id: "check_status"
+    step_type: "command"
+    instruction: |
+      Let's check the status of our repository.
+
+      You've made some changes to a file called `login.html`.
+
+      **Type:** `git status`
+    expected_commands:
+      - "git status"
+    success_message: |
+      You can see `login.html` appears as a modified file that's
+      **not staged for commit**.
+    failure_hints:
+      - "Type: git status"
+    setup_changes:
+      - "login.html"
+
+  - step_id: "explain_staging"
+    step_type: "explanation"
+    instruction: |
+      # The Staging Area
+
+      The **staging area** (also called "index") is like a preparation
+      area for your next commit.
+
+      - **Working directory** → Your actual files
+      - **Staging area** → Changes ready to be committed
+      - **Repository** → Saved history of commits
+
+      You use `git add` to move changes from working directory
+      to the staging area.
+
+      **Press Enter to continue...**
+
+  - step_id: "stage_file"
+    step_type: "command"
+    instruction: |
+      Let's stage the `login.html` file.
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+    success_message: "The file is now staged and ready to commit!"
+    failure_hints:
+      - "Type: git add login.html"
+      - "Make sure to include the filename"
+
+  - step_id: "check_staged"
+    step_type: "command"
+    instruction: |
+      Check the status again to see the difference.
+
+      **Type:** `git status`
+    expected_commands:
+      - "git status"
+    success_message: |
+      Now `login.html` appears under "Changes to be committed" in green.
+      It's staged and ready!
+    failure_hints:
+      - "Type: git status"
+
+  - step_id: "explain_commit_msg"
+    step_type: "explanation"
+    instruction: |
+      # Writing Good Commit Messages
+
+      A good commit message:
+      - **Starts with a verb**: "Add", "Fix", "Update", "Remove"
+      - **Is concise but descriptive**: Explains what and why
+      - **Uses present tense**: "Add login form" not "Added login form"
+
+      **Good examples:**
+      - "Add login form with email validation"
+      - "Fix navbar alignment on mobile"
+      - "Update dependencies to latest versions"
+
+      **Press Enter to continue...**
+
+  - step_id: "explain_commit_msg_bad"
+    step_type: "explanation"
+    instruction: |
+      # Commit Messages to Avoid
+
+      **Bad examples:**
+      - "changes"
+      - "fixed stuff"
+      - "WIP"
+
+      These messages don't explain what changed or why.
+      Your future self (and teammates) will thank you for clear messages!
+
+      **Press Enter to continue...**
+
+  - step_id: "commit"
+    step_type: "command"
+    instruction: |
+      Now let's create a commit with a descriptive message.
+
+      **Type:** `git commit -m "Add login form"`
+    expected_commands:
+      - "git commit -m \"Add login form\""
+      - "git commit -m 'Add login form'"
+    success_message: |
+      Your changes are now saved in a commit! This is a snapshot
+      in your project's history.
+    failure_hints:
+      - "Use: git commit -m \"Your message\""
+      - "The -m flag lets you write the message inline"
+      - "Try: git commit -m \"Add login form\""
+
+  - step_id: "view_log"
+    step_type: "command"
+    instruction: |
+      Let's view your commit history.
+
+      **Type:** `git log --oneline`
+    expected_commands:
+      - "git log --oneline"
+      - "git log"
+    success_message: |
+      You can see your new commit at the top! Each commit has a
+      unique ID (the hash) and your message.
+    failure_hints:
+      - "Type: git log --oneline"
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Lesson Complete!
+
+      You've learned how to create commits:
+
+      - **`git status`** - See what's changed
+      - **`git add <file>`** - Stage changes for commit
+      - **`git commit -m "message"`** - Create a commit
+      - **`git log`** - View commit history
+
+      **Key Point:** Make small, focused commits with clear messages.
+      This makes it easier to understand and review your changes!
+
+      **Press Enter to finish...**

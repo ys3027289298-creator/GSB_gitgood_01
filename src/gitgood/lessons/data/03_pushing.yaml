@@ -1,0 +1,139 @@
+lesson_id: "03_pushing"
+title: "Pushing to Remote"
+description: "Learn how to push your branch to GitHub"
+objectives:
+  - "Understand local vs remote repositories"
+  - "Push your branch to GitHub"
+  - "Set up upstream tracking"
+
+required_lessons:
+  - "02_commits"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Pushing to Remote
+
+      So far, your commits only exist on your **local machine**.
+      To share them and create a pull request, you need to push
+      them to a **remote repository** on GitHub.
+
+      - **Local** → Your computer
+      - **Remote** → GitHub's servers (usually called "origin")
+
+      **Press Enter to continue...**
+
+  - step_id: "setup"
+    step_type: "command"
+    instruction: |
+      Let's set up our branch with a commit.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+    success_message: "Branch created!"
+    setup_changes:
+      - "login.html"
+
+  - step_id: "stage_commit"
+    step_type: "command"
+    instruction: |
+      Stage and commit your changes in one command using `-a`.
+
+      (We have login.html with changes ready.)
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+      - "git add ."
+    success_message: "Files staged!"
+
+  - step_id: "commit"
+    step_type: "command"
+    instruction: |
+      Now commit the changes.
+
+      **Type:** `git commit -m "Add login form"`
+    expected_commands:
+      - "git commit -m \"Add login form\""
+      - "git commit -m 'Add login form'"
+    success_message: "Committed!"
+
+  - step_id: "check_remote"
+    step_type: "command"
+    instruction: |
+      Let's see what remotes are configured.
+
+      **Type:** `git remote -v`
+    expected_commands:
+      - "git remote -v"
+      - "git remote"
+    success_message: |
+      "origin" points to your GitHub repository. This is where
+      we'll push our branch.
+    failure_hints:
+      - "Type: git remote -v"
+
+  - step_id: "explain_push"
+    step_type: "explanation"
+    instruction: |
+      # Pushing Your Branch
+
+      When you push, you're uploading your local commits to GitHub.
+
+      The first time you push a new branch, use the `-u` flag:
+      ```
+      git push -u origin <branch-name>
+      ```
+
+      The `-u` flag sets up **tracking**, so future pushes are simpler.
+      After that, you can just use `git push`.
+
+      **Press Enter to continue...**
+
+  - step_id: "push"
+    step_type: "command"
+    instruction: |
+      Push your branch to GitHub with upstream tracking.
+
+      **Type:** `git push -u origin add-login`
+    expected_commands:
+      - "git push -u origin add-login"
+      - "git push --set-upstream origin add-login"
+    success_message: |
+      Excellent! Your branch is now on GitHub! Notice the message
+      suggesting you create a pull request.
+    failure_hints:
+      - "Use: git push -u origin <branch-name>"
+      - "The branch name is 'add-login'"
+
+  - step_id: "status_after"
+    step_type: "command"
+    instruction: |
+      Check the status to see the tracking relationship.
+
+      **Type:** `git status`
+    expected_commands:
+      - "git status"
+    success_message: |
+      Now it shows your branch is tracking `origin/add-login`.
+      You're ready to create a pull request!
+    failure_hints:
+      - "Type: git status"
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Lesson Complete!
+
+      You've learned how to push to GitHub:
+
+      - **`git remote -v`** - View configured remotes
+      - **`git push -u origin <branch>`** - Push with tracking
+      - After the first push, just use **`git push`**
+
+      **Key Point:** Always push your branch before creating a PR.
+      The `-u` flag makes future pushes easier!
+
+      **Press Enter to finish...**

@@ -1,0 +1,29 @@
+[project]
+name = "gitgood"
+version = "0.1.0"
+description = "Interactive CLI tool to learn GitHub flow"
+requires-python = ">=3.10"
+dependencies = [
+    "rich>=13.0.0",
+    "prompt-toolkit>=3.0.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+]
+
+[project.scripts]
+gitgood = "gitgood.__main__:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,196 @@
+lesson_id: "06_merging"
+title: "Merging and Cleanup"
+description: "Learn how to merge PRs and clean up branches"
+objectives:
+  - "Merge an approved pull request"
+  - "Update your local main branch"
+  - "Delete the feature branch"
+  - "Understand the complete GitHub flow"
+
+required_lessons:
+  - "05_code_review"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Merging Your Work
+
+      Once your PR is **approved**, it's time to merge it!
+
+      Merging combines your changes into the main branch.
+      After merging, you should:
+      1. Update your local main branch
+      2. Delete the feature branch (cleanup)
+
+      Let's complete the GitHub flow!
+
+      **Press Enter to continue...**
+
+  - step_id: "setup"
+    step_type: "command"
+    instruction: |
+      Let's set up a branch with an approved PR.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+    setup_changes:
+      - "login.html"
+
+  - step_id: "commit"
+    step_type: "command"
+    instruction: |
+      Stage and commit.
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+
+  - step_id: "commit2"
+    step_type: "command"
+    instruction: |
+      Create the commit.
+
+      **Type:** `git commit -m "Add login form"`
+    expected_commands:
+      - "git commit -m \"Add login form\""
+      - "git commit -m 'Add login form'"
+
+  - step_id: "push"
+    step_type: "command"
+    instruction: |
+      Push your branch.
+
+      **Type:** `git push -u origin add-login`
+    expected_commands:
+      - "git push -u origin add-login"
+
+  - step_id: "create_pr"
+    step_type: "command"
+    instruction: |
+      Create a PR.
+
+      **Type:** `gh pr create --title "Add login form" --body "Complete implementation"`
+    expected_commands:
+      - "gh pr create --title \"Add login form\" --body \"Complete implementation\""
+    command_pattern: "gh pr create.*"
+    success_message: "PR created! (Simulating approval...)"
+
+  - step_id: "explain_merge"
+    step_type: "explanation"
+    instruction: |
+      # Merging the PR
+
+      Your PR has been reviewed and approved! 🎉
+
+      There are three ways to merge on GitHub:
+      - **Merge commit** - Keeps all commits + creates a merge commit
+      - **Squash and merge** - Combines all commits into one
+      - **Rebase and merge** - Replays commits on top of main
+
+      We'll use a regular merge. You can merge using:
+      ```
+      gh pr merge
+      ```
+
+      **Press Enter to continue...**
+
+  - step_id: "merge"
+    step_type: "command"
+    instruction: |
+      Merge your pull request!
+
+      **Type:** `gh pr merge --merge`
+    expected_commands:
+      - "gh pr merge --merge"
+      - "gh pr merge"
+    success_message: |
+      Congratulations! Your code is now in main! 🎉
+    failure_hints:
+      - "Type: gh pr merge --merge"
+      - "Or just: gh pr merge"
+
+  - step_id: "explain_cleanup"
+    step_type: "explanation"
+    instruction: |
+      # Cleanup Time
+
+      After merging, you should:
+      1. Switch back to main
+      2. Pull the merged changes
+      3. Delete the feature branch (it's no longer needed)
+
+      This keeps your repository clean and organized!
+
+      **Press Enter to continue...**
+
+  - step_id: "switch_main"
+    step_type: "command"
+    instruction: |
+      Switch back to main.
+
+      **Type:** `git checkout main`
+    expected_commands:
+      - "git checkout main"
+      - "git switch main"
+
+  - step_id: "pull_main"
+    step_type: "command"
+    instruction: |
+      Pull the merged changes.
+
+      **Type:** `git pull`
+    expected_commands:
+      - "git pull"
+      - "git pull origin main"
+    success_message: "Your local main now has the merged changes!"
+
+  - step_id: "delete_branch"
+    step_type: "command"
+    instruction: |
+      Delete the feature branch (it's merged, we don't need it).
+
+      **Type:** `git branch -d add-login`
+    expected_commands:
+      - "git branch -d add-login"
+      - "git branch -D add-login"
+    success_message: "Branch deleted! Clean and tidy."
+
+  - step_id: "final_log"
+    step_type: "command"
+    instruction: |
+      Check the log to see your merged work.
+
+      **Type:** `git log --oneline`
+    expected_commands:
+      - "git log --oneline"
+      - "git log"
+    success_message: "You can see your commits are now in main!"
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Congratulations! 🎉
+
+      You've completed the entire **GitHub Flow**!
+
+      ## The Complete Workflow:
+      1. **Create branch** - `git checkout -b feature`
+      2. **Make commits** - `git add` + `git commit`
+      3. **Push branch** - `git push -u origin feature`
+      4. **Create PR** - `gh pr create`
+
+      **Press Enter to continue...**
+
+  - step_id: "summary_complete"
+    step_type: "explanation"
+    instruction: |
+      ## The Complete Workflow (continued):
+      5. **Review & update** - Make changes, push updates
+      6. **Merge** - `gh pr merge`
+      7. **Cleanup** - Delete branch, pull main
+
+      You're now ready to collaborate on GitHub like a pro!
+
+      **Press Enter to finish the course...**

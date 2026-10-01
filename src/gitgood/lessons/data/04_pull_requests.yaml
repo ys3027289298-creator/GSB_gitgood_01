@@ -1,0 +1,146 @@
+lesson_id: "04_pull_requests"
+title: "Creating Pull Requests"
+description: "Learn how to create pull requests using the GitHub CLI"
+objectives:
+  - "Understand what a pull request is"
+  - "Create a PR with a title and description"
+  - "View your pull requests"
+
+required_lessons:
+  - "03_pushing"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Pull Requests
+
+      A **Pull Request** (PR) is a request to merge your branch
+      into another branch (usually main).
+
+      PRs are the heart of collaboration on GitHub:
+      - They let others **review your code**
+      - They provide a place for **discussion**
+      - They create a **record** of what changed and why
+
+      We'll use the **GitHub CLI (gh)** to create PRs from the terminal.
+
+      **Press Enter to continue...**
+
+  - step_id: "setup"
+    step_type: "command"
+    instruction: |
+      Let's set up a branch with pushed changes.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+    setup_changes:
+      - "login.html"
+
+  - step_id: "commit"
+    step_type: "command"
+    instruction: |
+      Stage and commit your changes.
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+
+  - step_id: "commit2"
+    step_type: "command"
+    instruction: |
+      Create the commit.
+
+      **Type:** `git commit -m "Add login form"`
+    expected_commands:
+      - "git commit -m \"Add login form\""
+      - "git commit -m 'Add login form'"
+
+  - step_id: "push"
+    step_type: "command"
+    instruction: |
+      Push your branch to GitHub.
+
+      **Type:** `git push -u origin add-login`
+    expected_commands:
+      - "git push -u origin add-login"
+
+  - step_id: "explain_gh"
+    step_type: "explanation"
+    instruction: |
+      # The GitHub CLI
+
+      The **gh** command lets you interact with GitHub from your
+      terminal. It's perfect for:
+      - Creating pull requests
+      - Viewing PR status
+      - Merging PRs
+
+      To create a PR, we use:
+      ```
+      gh pr create --title "Title" --body "Description"
+      ```
+
+      **Press Enter to continue...**
+
+  - step_id: "create_pr"
+    step_type: "command"
+    instruction: |
+      Create a pull request for your branch.
+
+      **Type:** `gh pr create --title "Add login form" --body "This adds a login form with email validation."`
+    expected_commands:
+      - "gh pr create --title \"Add login form\" --body \"This adds a login form with email validation.\""
+      - "gh pr create -t \"Add login form\" -b \"This adds a login form with email validation.\""
+    command_pattern: "gh pr create.*--title.*--body.*"
+    success_message: |
+      Your pull request is created! Notice the PR URL - teammates
+      can now review your changes.
+    failure_hints:
+      - "Use: gh pr create --title \"Title\" --body \"Description\""
+      - "Make sure to include both --title and --body"
+
+  - step_id: "list_prs"
+    step_type: "command"
+    instruction: |
+      Let's see all open pull requests.
+
+      **Type:** `gh pr list`
+    expected_commands:
+      - "gh pr list"
+    success_message: |
+      You can see your PR is now listed as open!
+    failure_hints:
+      - "Type: gh pr list"
+
+  - step_id: "view_pr"
+    step_type: "command"
+    instruction: |
+      View the details of your pull request.
+
+      **Type:** `gh pr view`
+    expected_commands:
+      - "gh pr view"
+      - "gh pr view 1"
+    success_message: |
+      This shows the full details of your PR including the
+      description and status.
+    failure_hints:
+      - "Type: gh pr view"
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Lesson Complete!
+
+      You've learned how to create pull requests:
+
+      - **`gh pr create --title "..." --body "..."`** - Create a PR
+      - **`gh pr list`** - List open PRs
+      - **`gh pr view`** - View PR details
+
+      **Key Point:** Write clear PR titles and descriptions.
+      They help reviewers understand what you changed and why!
+
+      **Press Enter to finish...**

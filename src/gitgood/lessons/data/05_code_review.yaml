@@ -1,0 +1,167 @@
+lesson_id: "05_code_review"
+title: "Code Review Process"
+description: "Learn how to respond to code review feedback"
+objectives:
+  - "Understand the review process"
+  - "Make changes based on feedback"
+  - "Push additional commits to update PR"
+
+required_lessons:
+  - "04_pull_requests"
+
+steps:
+  - step_id: "intro"
+    step_type: "explanation"
+    instruction: |
+      # Code Review
+
+      After creating a PR, teammates will **review your code**.
+      They might:
+      - **Approve** it ✅
+      - **Request changes** 🔄
+      - **Leave comments** 💬
+
+      **Press Enter to continue...**
+
+  - step_id: "intro_workflow"
+    step_type: "explanation"
+    instruction: |
+      # Responding to Feedback
+
+      When changes are requested, you:
+      1. Make the fixes on your branch
+      2. Commit the changes
+      3. Push to update the PR
+
+      Let's practice this workflow!
+
+      **Press Enter to continue...**
+
+  - step_id: "setup"
+    step_type: "command"
+    instruction: |
+      Let's set up a branch with a PR.
+
+      **Type:** `git checkout -b add-login`
+    expected_commands:
+      - "git checkout -b add-login"
+    setup_changes:
+      - "login.html"
+
+  - step_id: "initial_commit"
+    step_type: "command"
+    instruction: |
+      Stage the initial changes.
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+
+  - step_id: "initial_commit2"
+    step_type: "command"
+    instruction: |
+      Commit your changes.
+
+      **Type:** `git commit -m "Add login form"`
+    expected_commands:
+      - "git commit -m \"Add login form\""
+      - "git commit -m 'Add login form'"
+
+  - step_id: "push_initial"
+    step_type: "command"
+    instruction: |
+      Push and create a PR.
+
+      **Type:** `git push -u origin add-login`
+    expected_commands:
+      - "git push -u origin add-login"
+
+  - step_id: "create_pr"
+    step_type: "command"
+    instruction: |
+      Create the pull request.
+
+      **Type:** `gh pr create --title "Add login form" --body "Initial implementation"`
+    expected_commands:
+      - "gh pr create --title \"Add login form\" --body \"Initial implementation\""
+    command_pattern: "gh pr create.*"
+    success_message: "PR created! Now let's simulate a review..."
+
+  - step_id: "explain_feedback"
+    step_type: "explanation"
+    instruction: |
+      # Reviewer Feedback
+
+      Your teammate reviewed the code and said:
+
+      > "Looks good! Can you add input validation for the email field?"
+
+      This is common - reviewers often catch things we miss.
+      Let's add the requested changes!
+
+      You've now modified `login.html` to add validation.
+
+      **Press Enter to continue...**
+    setup_changes:
+      - "login.html"
+
+  - step_id: "check_changes"
+    step_type: "command"
+    instruction: |
+      Check what files have changed.
+
+      **Type:** `git status`
+    expected_commands:
+      - "git status"
+    success_message: "You can see login.html has been modified."
+
+  - step_id: "stage_fix"
+    step_type: "command"
+    instruction: |
+      Stage the updated file.
+
+      **Type:** `git add login.html`
+    expected_commands:
+      - "git add login.html"
+      - "git add ."
+
+  - step_id: "commit_fix"
+    step_type: "command"
+    instruction: |
+      Commit with a message describing the fix.
+
+      **Type:** `git commit -m "Add email validation"`
+    expected_commands:
+      - "git commit -m \"Add email validation\""
+      - "git commit -m 'Add email validation'"
+    success_message: "Fix committed!"
+
+  - step_id: "push_update"
+    step_type: "command"
+    instruction: |
+      Push to update the PR. Since tracking is set up, just:
+
+      **Type:** `git push`
+    expected_commands:
+      - "git push"
+      - "git push origin add-login"
+    success_message: |
+      Your PR is updated! The reviewer will see the new commit
+      in the PR timeline.
+
+  - step_id: "summary"
+    step_type: "explanation"
+    instruction: |
+      # Lesson Complete!
+
+      You've learned how to handle code review:
+
+      1. Read the feedback carefully
+      2. Make the requested changes
+      3. **`git add`** → **`git commit`** → **`git push`**
+      4. The PR updates automatically!
+
+      **Key Point:** Each push adds commits to your open PR.
+      You don't need to create a new PR - just push updates!
+
+      **Press Enter to finish...**
