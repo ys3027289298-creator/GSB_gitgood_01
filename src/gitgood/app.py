@@ -1,7 +1,9 @@
 """Main application orchestrator."""
 
 import signal
+from typing import Optional
 
+from .core.models import CommandResult
 from .core.repository import VirtualRepository
 from .core.github_api import SimulatedGitHub
 from .parser.lexer import CommandLexer, ParseError
@@ -141,7 +143,13 @@ class GitGoodApp:
 
             if validation.success:
                 # Execute the command in simulator
-                self._execute_command(user_input)
+                result = self._execute_command(user_input)
+
+                # Only reward the step if the command actually worked;
+                # a failed command must not print success or advance.
+                if result is None or not result.success:
+                    return
+
                 self.console.print_success(validation.message)
 
                 # Save current lesson before advancing (it gets cleared on completion)
@@ -160,7 +168,7 @@ class GitGoodApp:
             # Free-form mode - just execute
             self._execute_command(user_input)
 
-    def _execute_command(self, user_input: str) -> None:
+    def _execute_command(self, user_input: str) -> Optional[CommandResult]:
         """Parse and execute a command."""
         try:
             parsed = self.lexer.parse(user_input)
@@ -168,7 +176,7 @@ class GitGoodApp:
 
             if result.message == "__EXIT__":
                 self.running = False
-                return
+                return result
 
             if result.output:
                 self.console.print_command_output(result.output)
@@ -178,8 +186,21 @@ class GitGoodApp:
                 if result.hints:
                     self.console.print_hint(result.hints)
 
+            return result
+
         except ParseError as e:
             self.console.print_error(str(e))
+            return None
+        except Exception as e:  # noqa: BLE001 - last line of defense
+            # An unexpected error must never leave the repository in an
+            # inconsistent state: run the invariant-based recovery.
+            self.console.print_error(f"Internal error: {e}")
+            repairs = self.repo.recover()
+            if repairs:
+                self.console.print_info(
+                    "Repository state was repaired: " + "; ".join(repairs)
+                )
+            return None
 
     def _show_lessons(self) -> None:
         """Show the lesson list with full screen clear."""

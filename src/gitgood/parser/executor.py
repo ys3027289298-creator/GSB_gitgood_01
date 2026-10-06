@@ -64,6 +64,8 @@ class CommandExecutor:
             "checkout": self._git_checkout,
             "switch": self._git_switch,
             "merge": self._git_merge,
+            "rebase": self._git_rebase,
+            "reset": self._git_reset,
             "log": self._git_log,
             "push": self._git_push,
             "pull": self._git_pull,
@@ -83,6 +85,25 @@ class CommandExecutor:
                 success=False,
                 message=f"git: '{cmd.command}' is not a git command",
                 hints=["Type 'help' to see available commands"],
+            )
+
+        # While a rebase is in progress, most history-changing commands are
+        # unsafe; force the user to continue or abort first.
+        if self.repo.state.rebase and cmd.command in (
+            "commit",
+            "checkout",
+            "switch",
+            "merge",
+            "push",
+            "pull",
+        ):
+            return CommandResult(
+                success=False,
+                message=f"error: cannot 'git {cmd.command}' while a rebase is in progress",
+                hints=[
+                    "Finish with 'git rebase --continue'",
+                    "Or undo with 'git rebase --abort'",
+                ],
             )
 
         return handler(cmd)
@@ -226,6 +247,27 @@ class CommandExecutor:
 
         no_ff = "--no-ff" in cmd.flags
         return self.repo.merge(cmd.args[0], no_ff=no_ff)
+
+    def _git_rebase(self, cmd: ParsedCommand) -> CommandResult:
+        if "--continue" in cmd.flags:
+            return self.repo.rebase_continue()
+
+        if "--abort" in cmd.flags:
+            return self.repo.rebase_abort()
+
+        if not cmd.args:
+            return CommandResult(
+                success=False,
+                message="error: specify a branch to rebase onto",
+                hints=["Usage: git rebase <branch>"],
+            )
+
+        return self.repo.rebase(cmd.args[0])
+
+    def _git_reset(self, cmd: ParsedCommand) -> CommandResult:
+        hard = "--hard" in cmd.flags
+        filename = cmd.args[0] if cmd.args else None
+        return self.repo.reset(filename=filename, hard=hard)
 
     def _git_log(self, cmd: ParsedCommand) -> CommandResult:
         oneline = "--oneline" in cmd.flags

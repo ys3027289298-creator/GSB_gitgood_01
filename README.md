@@ -109,6 +109,15 @@ git merge <branch>            # Merge a branch
 git reset                     # Reset changes
 ```
 
+**Rebasing & Recovery**
+```bash
+git rebase <branch>           # Rebase current branch onto another
+git rebase --continue         # Continue after resolving conflicts
+git rebase --abort            # Abort and return to the pre-rebase state
+git reset <file>              # Unstage a file
+git reset --hard              # Clear staging area and working directory
+```
+
 ### GitHub CLI Commands
 
 ```bash

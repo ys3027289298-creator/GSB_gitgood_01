@@ -19,6 +19,7 @@ class Commit:
     sha: str
     message: str
     parent_sha: Optional[str] = None
+    parent2_sha: Optional[str] = None  # second parent of merge commits
     timestamp: datetime = field(default_factory=datetime.now)
     author: str = "learner"
     files_changed: list[str] = field(default_factory=list)
@@ -38,6 +39,19 @@ class StagedChange:
     """Represents a file staged for commit."""
     filename: str
     change_type: str  # "added", "modified", "deleted"
+
+
+@dataclass
+class RebaseState:
+    """Tracks an in-progress rebase so it can be continued or aborted."""
+    branch: str                 # branch being rebased (HEAD when rebase started)
+    onto: str                   # target branch we rebase onto
+    original_sha: str           # branch tip before the rebase (abort target)
+    conflicted_files: list[str] = field(default_factory=list)
+
+    @property
+    def conflicted(self) -> bool:
+        return bool(self.conflicted_files)
 
 
 @dataclass
@@ -66,6 +80,8 @@ class RepositoryState:
 
     staged_changes: list[StagedChange] = field(default_factory=list)
     working_changes: list[str] = field(default_factory=list)
+
+    rebase: Optional[RebaseState] = None
 
     remote_url: Optional[str] = None
     pull_requests: dict[int, PullRequest] = field(default_factory=dict)

@@ -113,9 +113,30 @@ https://github.com/learner/my-project/pull/{pr_number}
                 message=f"error: pull request #{pr_number} is already {pr.status.value}",
             )
 
-        # Perform the merge in the virtual repo
-        self.repo.checkout(pr.target_branch)
-        self.repo.merge(pr.source_branch)
+        if pr.source_branch not in self.repo.state.branches:
+            return CommandResult(
+                success=False,
+                message=f"error: head branch '{pr.source_branch}' was deleted; cannot merge",
+            )
+
+        # Perform the merge in the virtual repo. If anything fails, roll
+        # back to the branch the user was on so the state stays consistent.
+        original_branch = self.repo.state.head
+
+        checkout_result = self.repo.checkout(pr.target_branch)
+        if not checkout_result.success:
+            return CommandResult(
+                success=False,
+                message=f"error: cannot merge PR #{pr_number}: {checkout_result.message}",
+            )
+
+        merge_result = self.repo.merge(pr.source_branch)
+        if not merge_result.success:
+            self.repo.checkout(original_branch)
+            return CommandResult(
+                success=False,
+                message=f"error: merge failed, restored '{original_branch}': {merge_result.message}",
+            )
 
         pr.status = PRStatus.MERGED
 

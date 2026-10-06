@@ -1,6 +1,7 @@
 """Lesson engine for managing tutorial progression."""
 
 import re
+import shlex
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional, Callable, TYPE_CHECKING
@@ -250,21 +251,33 @@ class LessonEngine:
         if input_cmd == expected_cmd:
             return True
 
-        # Handle quote variations
-        input_cmd = input_cmd.replace("'", '"')
-        expected_cmd = expected_cmd.replace("'", '"')
+        # Compare structure rather than raw text:
+        # - positional tokens (including flag values) must appear in order
+        # - flags may appear in any order
+        # - single/double quote differences are ignored
+        input_canon = self._canonical_tokens(input_cmd)
+        expected_canon = self._canonical_tokens(expected_cmd)
 
-        if input_cmd == expected_cmd:
-            return True
+        return (
+            input_canon is not None
+            and expected_canon is not None
+            and input_canon == expected_canon
+        )
 
-        # Handle flag order variations for git commands
-        if input_cmd.startswith("git ") and expected_cmd.startswith("git "):
-            input_parts = set(input_cmd.split())
-            expected_parts = set(expected_cmd.split())
-            if input_parts == expected_parts:
-                return True
+    @staticmethod
+    def _canonical_tokens(cmd: str) -> Optional[tuple[tuple[str, ...], tuple[str, ...]]]:
+        """Split a command into (ordered positionals, sorted flags)."""
+        try:
+            tokens = shlex.split(cmd)
+        except ValueError:
+            tokens = cmd.split()
 
-        return False
+        if not tokens:
+            return None
+
+        positional = tuple(t for t in tokens if not t.startswith("-"))
+        flags = tuple(sorted(t for t in tokens if t.startswith("-")))
+        return positional, flags
 
     def _generate_feedback(self, user_input: str, step: LessonStep) -> ValidationResult:
         """Generate helpful feedback when user command is incorrect."""

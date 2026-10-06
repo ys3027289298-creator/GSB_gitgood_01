@@ -24,6 +24,29 @@ class ParsedCommand:
 INTERNAL_COMMANDS = {"help", "quit", "exit", "lesson", "lessons", "hint", "skip", "reset"}
 
 
+# Flags that never take a value: the token after them is a positional
+# argument, not the flag's value. Without this, e.g. "git merge --no-ff
+# feature" would swallow "feature" as the flag value and lose the branch.
+BOOLEAN_FLAGS = {
+    "--no-ff",
+    "--oneline",
+    "--staged",
+    "--cached",
+    "--all",
+    "--amend",
+    "--hard",
+    "--soft",
+    "--continue",
+    "--abort",
+    "--merge",
+    "--squash",
+    "--rebase",
+    "-a",
+    "-A",
+    "-v",
+}
+
+
 class CommandLexer:
     """Tokenize and parse user input into structured commands."""
 
@@ -92,7 +115,7 @@ class CommandLexer:
             remaining = remaining[1:]
 
         # Parse flags and arguments
-        flags = {}
+        flags: dict[str, Optional[str]] = {}
         args = []
         i = 0
         while i < len(remaining):
@@ -102,6 +125,8 @@ class CommandLexer:
                 if "=" in token:
                     key, value = token.split("=", 1)
                     flags[key] = value
+                elif token in BOOLEAN_FLAGS:
+                    flags[token] = None
                 elif i + 1 < len(remaining) and not remaining[i + 1].startswith("-"):
                     flags[token] = remaining[i + 1]
                     i += 1
@@ -110,7 +135,9 @@ class CommandLexer:
             elif token.startswith("-") and len(token) > 1:
                 # Short flag
                 flag = token
-                if i + 1 < len(remaining) and not remaining[i + 1].startswith("-"):
+                if flag in BOOLEAN_FLAGS:
+                    flags[flag] = None
+                elif i + 1 < len(remaining) and not remaining[i + 1].startswith("-"):
                     flags[flag] = remaining[i + 1]
                     i += 1
                 else:

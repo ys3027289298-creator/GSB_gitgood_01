@@ -31,7 +31,15 @@ class CommitTreeRenderer:
         lines = []
 
         # Get commits starting from current branch
-        current_sha = self.repo.state.branches[self.repo.state.head].commit_sha
+        head_branch = self.repo.state.branches.get(self.repo.state.head)
+        if head_branch is None:
+            return Panel(
+                "[dim]Repository state is inconsistent; HEAD points to no branch.[/dim]",
+                title="[bold]Commit History[/bold]",
+                border_style="yellow",
+                padding=(0, 1),
+            )
+        current_sha = head_branch.commit_sha
 
         visited = 0
         sha = current_sha
@@ -89,7 +97,8 @@ class CommitTreeRenderer:
 
         # Check if HEAD points here
         current_branch = self.repo.state.head
-        if self.repo.state.branches[current_branch].commit_sha == sha:
+        head_branch = self.repo.state.branches.get(current_branch)
+        if head_branch and head_branch.commit_sha == sha:
             decorations.append(f"[bold green]HEAD -> {current_branch}[/bold green]")
 
         # Check other local branches
