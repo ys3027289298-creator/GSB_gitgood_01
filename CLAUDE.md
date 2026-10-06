@@ -17,7 +17,7 @@ gitgood
 # or
 python3 -m gitgood
 
-# Run tests (none exist yet)
+# Run tests
 pytest
 pytest --cov=src/gitgood tests/    # with coverage
 pytest tests/test_repository.py   # single file

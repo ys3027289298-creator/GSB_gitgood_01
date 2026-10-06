@@ -89,6 +89,16 @@ GIT_COMMANDS = {
             "--no-ff": "Create a merge commit even for fast-forward",
         },
     ),
+    "rebase": CommandSpec(
+        name="rebase",
+        description="Reapply commits on top of another base tip",
+        usage="git rebase <branch> | git rebase --continue | git rebase --abort",
+        optional_args=["branch"],
+        flags={
+            "--continue": "Continue after resolving conflicts",
+            "--abort": "Abort and roll back to the original state",
+        },
+    ),
     "log": CommandSpec(
         name="log",
         description="Show commit logs",

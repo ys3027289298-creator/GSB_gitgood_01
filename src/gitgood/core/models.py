@@ -13,12 +13,20 @@ class PRStatus(Enum):
     CLOSED = "closed"
 
 
+class RebaseStatus(Enum):
+    """Rebase state machine status."""
+    IDLE = "idle"
+    IN_PROGRESS = "in_progress"
+    CONFLICT = "conflict"
+
+
 @dataclass
 class Commit:
     """Represents a single commit in the virtual repository."""
     sha: str
     message: str
     parent_sha: Optional[str] = None
+    merge_parent_sha: Optional[str] = None
     timestamp: datetime = field(default_factory=datetime.now)
     author: str = "learner"
     files_changed: list[str] = field(default_factory=list)
@@ -55,6 +63,17 @@ class PullRequest:
 
 
 @dataclass
+class RebaseState:
+    """State of an in-progress rebase (rollback anchor included)."""
+    status: RebaseStatus = RebaseStatus.IDLE
+    original_branch: Optional[str] = None
+    original_sha: Optional[str] = None
+    onto: Optional[str] = None
+    remaining_shas: list[str] = field(default_factory=list)
+    conflicted_files: list[str] = field(default_factory=list)
+
+
+@dataclass
 class RepositoryState:
     """Complete state of the virtual repository."""
     commits: dict[str, Commit] = field(default_factory=dict)
@@ -70,6 +89,8 @@ class RepositoryState:
     remote_url: Optional[str] = None
     pull_requests: dict[int, PullRequest] = field(default_factory=dict)
     next_pr_number: int = 1
+
+    rebase: RebaseState = field(default_factory=RebaseState)
 
 
 @dataclass
@@ -90,3 +111,5 @@ class RepositoryStatus:
     behind: int = 0
     staged: list[StagedChange] = field(default_factory=list)
     unstaged: list[str] = field(default_factory=list)
+    rebasing: bool = False
+    rebase_conflicts: list[str] = field(default_factory=list)

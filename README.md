@@ -106,6 +106,9 @@ git fetch                     # Fetch from remote
 **Merging**
 ```bash
 git merge <branch>            # Merge a branch
+git rebase <branch>           # Rebase onto a branch
+git rebase --continue         # Continue after resolving conflicts
+git rebase --abort            # Abort and roll back a rebase
 git reset                     # Reset changes
 ```
 

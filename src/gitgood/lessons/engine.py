@@ -8,6 +8,8 @@ from typing import Optional, Callable, TYPE_CHECKING
 if TYPE_CHECKING:
     from ..core.repository import VirtualRepository
 
+from ..parser.lexer import CommandLexer, ParseError
+
 
 class StepType(Enum):
     """Type of lesson step."""
@@ -245,26 +247,35 @@ class LessonEngine:
         return cmd
 
     def _commands_match(self, input_cmd: str, expected_cmd: str) -> bool:
-        """Check if two commands match (with some flexibility)."""
-        # Exact match
+        """Order-sensitive structural comparison.
+
+        Token order matters: ``git login.html add`` must NOT match
+        ``git add login.html``. Quotes are normalized by the lexer and the
+        relative position of flags does not matter, but positional
+        arguments keep their order.
+        """
+        # Exact match (fast path, also covers non-git internal commands)
         if input_cmd == expected_cmd:
             return True
 
-        # Handle quote variations
-        input_cmd = input_cmd.replace("'", '"')
-        expected_cmd = expected_cmd.replace("'", '"')
+        lexer = CommandLexer()
+        try:
+            parsed_input = lexer.parse(input_cmd)
+            parsed_expected = lexer.parse(expected_cmd)
+        except ParseError:
+            return False
 
-        if input_cmd == expected_cmd:
-            return True
-
-        # Handle flag order variations for git commands
-        if input_cmd.startswith("git ") and expected_cmd.startswith("git "):
-            input_parts = set(input_cmd.split())
-            expected_parts = set(expected_cmd.split())
-            if input_parts == expected_parts:
-                return True
-
-        return False
+        if parsed_input.command_type != parsed_expected.command_type:
+            return False
+        if parsed_input.command.lower() != parsed_expected.command.lower():
+            return False
+        if (parsed_input.subcommand or "").lower() != (
+            parsed_expected.subcommand or ""
+        ).lower():
+            return False
+        if parsed_input.args != parsed_expected.args:
+            return False
+        return parsed_input.flags == parsed_expected.flags
 
     def _generate_feedback(self, user_input: str, step: LessonStep) -> ValidationResult:
         """Generate helpful feedback when user command is incorrect."""

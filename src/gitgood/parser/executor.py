@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from ..core.models import CommandResult
+from ..core.models import CommandResult, RebaseStatus
 from ..core.repository import VirtualRepository
 from ..core.github_api import SimulatedGitHub
 from .lexer import ParsedCommand, ParseError
@@ -18,17 +18,32 @@ class CommandExecutor:
 
     def execute(self, cmd: ParsedCommand) -> CommandResult:
         """Execute a parsed command and return the result."""
-        if cmd.command_type == "internal":
-            return self._handle_internal(cmd)
-        elif cmd.command_type == "git":
-            return self._handle_git(cmd)
-        elif cmd.command_type == "gh":
-            return self._handle_gh(cmd)
+        try:
+            if cmd.command_type == "internal":
+                result = self._handle_internal(cmd)
+            elif cmd.command_type == "git":
+                result = self._handle_git(cmd)
+            elif cmd.command_type == "gh":
+                result = self._handle_gh(cmd)
+            else:
+                result = CommandResult(
+                    success=False,
+                    message=f"Unknown command type: {cmd.command_type}",
+                )
+        except Exception as exc:  # noqa: BLE001 - never crash the REPL: restore and report
+            self.repo.restore_consistency()
+            return CommandResult(
+                success=False,
+                message=f"internal error: {exc}",
+                hints=["Repository state was restored to a consistent state."],
+            )
 
-        return CommandResult(
-            success=False,
-            message=f"Unknown command type: {cmd.command_type}",
-        )
+        # Post-condition: every command leaves the repository in a consistent
+        # state. Repair automatically if a handler violated an invariant.
+        if self.repo.check_invariants():
+            self.repo.restore_consistency()
+
+        return result
 
     def _handle_internal(self, cmd: ParsedCommand) -> CommandResult:
         """Handle internal commands."""
@@ -70,6 +85,8 @@ class CommandExecutor:
             "fetch": self._git_fetch,
             "diff": self._git_diff,
             "remote": self._git_remote,
+            "rebase": self._git_rebase,
+            "reset": self._git_reset,
         }
 
         handler = handlers.get(cmd.command)
@@ -226,6 +243,37 @@ class CommandExecutor:
 
         no_ff = "--no-ff" in cmd.flags
         return self.repo.merge(cmd.args[0], no_ff=no_ff)
+
+    def _git_rebase(self, cmd: ParsedCommand) -> CommandResult:
+        if "--abort" in cmd.flags:
+            return self.repo.rebase_abort()
+
+        if "--continue" in cmd.flags:
+            return self.repo.rebase_continue()
+
+        if not cmd.args:
+            return CommandResult(
+                success=False,
+                message="error: specify a branch to rebase onto",
+                hints=[
+                    "Usage: git rebase <branch>",
+                    "During a conflict: git rebase --continue | git rebase --abort",
+                ],
+            )
+
+        return self.repo.rebase(cmd.args[0])
+
+    def _git_reset(self, cmd: ParsedCommand) -> CommandResult:
+        if self.repo.state.rebase.status != RebaseStatus.IDLE:
+            return CommandResult(
+                success=False,
+                message="error: cannot reset while a rebase is in progress",
+                hints=["Use 'git rebase --continue' or 'git rebase --abort'"],
+            )
+
+        hard = "--hard" in cmd.flags
+        filename = cmd.args[0] if cmd.args else None
+        return self.repo.reset(filename=filename, hard=hard)
 
     def _git_log(self, cmd: ParsedCommand) -> CommandResult:
         oneline = "--oneline" in cmd.flags

@@ -113,9 +113,19 @@ https://github.com/learner/my-project/pull/{pr_number}
                 message=f"error: pull request #{pr_number} is already {pr.status.value}",
             )
 
-        # Perform the merge in the virtual repo
-        self.repo.checkout(pr.target_branch)
-        self.repo.merge(pr.source_branch)
+        # The target branch must still exist; fail without touching anything.
+        if pr.target_branch not in self.repo.state.branches:
+            return CommandResult(
+                success=False,
+                message=f"error: target branch '{pr.target_branch}' no longer exists",
+            )
+
+        # Perform the merge in the virtual repo (GitHub always creates a
+        # merge commit and never moves the local HEAD). If the merge fails,
+        # the PR stays OPEN and the repository is left untouched.
+        result = self.repo.merge_into(pr.target_branch, pr.source_branch, no_ff=True)
+        if not result.success:
+            return result
 
         pr.status = PRStatus.MERGED
 

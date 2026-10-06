@@ -25,6 +25,15 @@ class StatusPanel:
         # Current branch
         lines.append(f"On branch [orange1 bold]{status.current_branch}[/orange1 bold]")
 
+        # Rebase in progress
+        if status.rebasing:
+            if status.rebase_conflicts:
+                lines.append("[red]Rebase in progress (conflicts)[/red]")
+                lines.append("[dim]  git add <file> → git rebase --continue[/dim]")
+                lines.append("[dim]  or git rebase --abort to roll back[/dim]")
+            else:
+                lines.append("[yellow]Rebase in progress[/yellow]")
+
         # Remote tracking info
         if status.upstream:
             if status.ahead > 0:

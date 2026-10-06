@@ -4,6 +4,7 @@ import signal
 
 from .core.repository import VirtualRepository
 from .core.github_api import SimulatedGitHub
+from .core.models import CommandResult
 from .parser.lexer import CommandLexer, ParseError
 from .parser.executor import CommandExecutor
 from .lessons.engine import LessonEngine, StepType, Lesson
@@ -61,6 +62,11 @@ class GitGoodApp:
                 continue
             except EOFError:
                 break
+            except Exception as exc:  # noqa: BLE001 - REPL top-level safety net
+                # Never crash the REPL: restore a consistent repo state.
+                self.repo.restore_consistency()
+                self.console.print_error(f"Internal error: {exc}")
+                self.console.print_hint(["Repository state was restored to a consistent state."])
 
         self.console.console.print("\nGoodbye! Happy coding!\n")
 
@@ -141,18 +147,22 @@ class GitGoodApp:
 
             if validation.success:
                 # Execute the command in simulator
-                self._execute_command(user_input)
-                self.console.print_success(validation.message)
+                result = self._execute_command(user_input)
 
-                # Save current lesson before advancing (it gets cleared on completion)
-                completed_lesson = self.lesson_engine.current_lesson
+                # Only advance when the command actually succeeded; a
+                # validated-but-failed command keeps the user on the step.
+                if result is not None and result.success:
+                    self.console.print_success(validation.message)
 
-                # Advance to next step
-                self.lesson_engine.advance_step()
+                    # Save current lesson before advancing (it gets cleared on completion)
+                    completed_lesson = self.lesson_engine.current_lesson
 
-                # Check if lesson is complete
-                if not self.lesson_engine.get_current_step():
-                    self._handle_lesson_complete(completed_lesson)
+                    # Advance to next step
+                    self.lesson_engine.advance_step()
+
+                    # Check if lesson is complete
+                    if not self.lesson_engine.get_current_step():
+                        self._handle_lesson_complete(completed_lesson)
             else:
                 self.console.print_error(validation.message)
                 self.console.print_hint(validation.hints)
@@ -160,15 +170,15 @@ class GitGoodApp:
             # Free-form mode - just execute
             self._execute_command(user_input)
 
-    def _execute_command(self, user_input: str) -> None:
-        """Parse and execute a command."""
+    def _execute_command(self, user_input: str) -> CommandResult | None:
+        """Parse and execute a command, returning its result (None on parse error)."""
         try:
             parsed = self.lexer.parse(user_input)
             result = self.executor.execute(parsed)
 
             if result.message == "__EXIT__":
                 self.running = False
-                return
+                return result
 
             if result.output:
                 self.console.print_command_output(result.output)
@@ -178,8 +188,11 @@ class GitGoodApp:
                 if result.hints:
                     self.console.print_hint(result.hints)
 
+            return result
+
         except ParseError as e:
             self.console.print_error(str(e))
+            return None
 
     def _show_lessons(self) -> None:
         """Show the lesson list with full screen clear."""
